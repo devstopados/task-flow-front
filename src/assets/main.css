@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+@import './base.css';
+
+@theme {
+  --color-primary: #035aa6;
+  --color-secondary: #1b8ef2;
+  --color-neutral: #d5e5f2;
+  --color-gray: #b1b1b1;
+  --color-white: #ffffff;
+  --color-dark: #000000;
+  --color-sucess: #a9d063;
+  --color-danger: #ef867a;
+  --color-info: #63b7f9;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 30%),
+    linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.2);
+}
