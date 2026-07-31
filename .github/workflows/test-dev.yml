@@ -1,4 +1,4 @@
-name: CI - Pull Request Dev
+name: CI - Testing Dev
 
 on:
   pull_request:
