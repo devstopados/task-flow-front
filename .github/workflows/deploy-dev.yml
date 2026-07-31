@@ -1,15 +1,11 @@
 name: CI/CD - Dev
 
 on:
-  push:
-    branches:
-      - dev
-    paths-ignore:
-      - "dist/**"
-
   pull_request:
     branches:
       - dev
+    types:
+      - closed
 
   workflow_dispatch:
 
@@ -21,10 +17,15 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.merged == true
+
     steps:
-      - name: Baixar código do repositório
+      - name: Baixar branch dev
         uses: actions/checkout@v5
         with:
+          ref: dev
           fetch-depth: 0
 
       - name: Configurar Node.js
@@ -40,7 +41,6 @@ jobs:
         run: npm run build
 
       - name: Comitar pasta dist na branch dev
-        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -58,8 +58,6 @@ jobs:
     name: Deploy em desenvolvimento
     runs-on: ubuntu-latest
     needs: build
-
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
 
     steps:
       - name: Atualizar projeto no servidor
