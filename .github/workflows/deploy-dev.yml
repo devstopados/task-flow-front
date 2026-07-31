@@ -4,12 +4,17 @@ on:
   push:
     branches:
       - dev
+    paths-ignore:
+      - "dist/**"
 
   pull_request:
     branches:
       - dev
 
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -18,6 +23,9 @@ jobs:
     steps:
       - name: Baixar código do repositório
         uses: actions/checkout@v5
+        with:
+          ref: dev
+          fetch-depth: 0
 
       - name: Configurar Node.js
         uses: actions/setup-node@v5
@@ -30,3 +38,18 @@ jobs:
 
       - name: Executar build
         run: npm run build
+
+      - name: Comitar pasta dist na branch dev
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -f dist
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração na pasta dist."
+          else
+            git commit -m "build: atualizar pasta dist [skip ci]"
+            git push origin dev
+          fi
