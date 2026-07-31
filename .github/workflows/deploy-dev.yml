@@ -1,11 +1,11 @@
 name: CI/CD - Dev
 
 on:
-  pull_request:
+  push:
     branches:
       - dev
-    types:
-      - closed
+    paths-ignore:
+      - "dist/**"
 
   workflow_dispatch:
 
@@ -16,10 +16,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.merged == true
 
     steps:
       - name: Baixar branch dev
