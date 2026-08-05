@@ -14,7 +14,7 @@
             label="Usuário"
             type="text"
             autocomplete="username"
-            placeholder="Placeholder"
+            placeholder="Informe seu e-mail"
             required
             :error="usernameError"
             @blur="markTouched('username')"
@@ -28,7 +28,7 @@
             label="Senha"
             :type="showPassword ? 'text' : 'password'"
             autocomplete="current-password"
-            placeholder="Placeholder"
+            placeholder="Informe sua senha"
             required
             :error="passwordError"
             @blur="markTouched('password')"
