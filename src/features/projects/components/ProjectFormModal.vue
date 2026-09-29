@@ -6,53 +6,54 @@
     confirm-label="Salvar"
     :loading="loading"
     @update:model-value="emit('update:modelValue', $event)"
-    @confirm="handleConfirm"
+    @confirm="onSubmit"
     @cancel="handleCancel"
   >
-    <form class="flex flex-col gap-4" @submit.prevent="handleConfirm">
+    <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
       <div class="grid grid-cols-2 gap-4">
         <TaskInput
-          v-model="form.name"
+          v-model="name"
+          v-bind="nameAttrs"
           label="Nome do projeto"
           placeholder="Digite o nome"
           required
           :error="errors.name"
-          @blur="markTouched('name')"
         />
 
         <TaskInput
-          v-model="form.responsible"
+          v-model="responsible"
+          v-bind="responsibleAttrs"
           label="Responsável"
           placeholder="Digite o responsável"
           required
           :error="errors.responsible"
-          @blur="markTouched('responsible')"
         />
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <TaskInput
-          v-model="form.startDate"
+          v-model="startDate"
+          v-bind="startDateAttrs"
           label="Data de início"
           type="date"
           required
           :error="errors.startDate"
-          @blur="markTouched('startDate')"
         />
 
         <TaskSelect
-          v-model="form.status"
+          v-model="status"
+          v-bind="statusAttrs"
           label="Status"
           placeholder="Selecione o status"
           :options="statusOptions"
           required
           :error="errors.status"
-          @blur="markTouched('status')"
         />
       </div>
 
       <TaskTextArea
-        v-model="form.description"
+        v-model="description"
+        v-bind="descriptionAttrs"
         label="Descrição"
         placeholder="Descreva o projeto"
         :rows="3"
@@ -64,15 +65,20 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import * as yup from 'yup'
 import TaskModal from '@/components/TaskModal.vue'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskSelect from '@/components/TaskSelect.vue'
 import TaskTextArea from '@/components/TaskTextArea.vue'
+import type { ProjectFormData } from '@/types'
 
 defineOptions({
   name: 'ProjectFormModal',
 })
+
+export type { ProjectFormData }
 
 defineProps<{
   modelValue: boolean
@@ -80,28 +86,8 @@ defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void
-  (event: 'saved', payload: typeof form): void
+  (event: 'saved', payload: ProjectFormData): void
 }>()
-
-type FieldName = 'name' | 'responsible' | 'startDate' | 'status'
-
-const loading = ref(false)
-const submitted = ref(false)
-
-const form = reactive({
-  name: '',
-  responsible: '',
-  startDate: '',
-  status: '',
-  description: '',
-})
-
-const touched = reactive<Record<FieldName, boolean>>({
-  name: false,
-  responsible: false,
-  startDate: false,
-  status: false,
-})
 
 const statusOptions = [
   { label: 'Não Iniciado', value: 'Não Iniciado' },
@@ -110,51 +96,44 @@ const statusOptions = [
   { label: 'Concluído', value: 'Concluído' },
 ]
 
-const errors = reactive<Record<FieldName, string>>({
-  name: '',
-  responsible: '',
-  startDate: '',
-  status: '',
+const projectSchema = yup.object({
+  name: yup.string().trim().required('Informe o nome do projeto.'),
+  responsible: yup.string().trim().required('Informe o responsável.'),
+  startDate: yup.string().required('Informe a data de início.'),
+  status: yup.string().required('Selecione um status.'),
+  description: yup.string().default(''),
 })
 
-function validate(): boolean {
-  errors.name = form.name.trim() ? '' : 'Informe o nome do projeto.'
-  errors.responsible = form.responsible.trim() ? '' : 'Informe o responsável.'
-  errors.startDate = form.startDate ? '' : 'Informe a data de início.'
-  errors.status = form.status ? '' : 'Selecione um status.'
-  return !Object.values(errors).some(Boolean)
-}
+const { errors, defineField, handleSubmit, resetForm } = useForm<ProjectFormData>({
+  validationSchema: projectSchema,
+  initialValues: {
+    name: '',
+    responsible: '',
+    startDate: '',
+    status: '',
+    description: '',
+  },
+})
 
-function markTouched(field: FieldName) {
-  touched[field] = true
-  validate()
-}
+const [name, nameAttrs] = defineField('name')
+const [responsible, responsibleAttrs] = defineField('responsible')
+const [startDate, startDateAttrs] = defineField('startDate')
+const [status, statusAttrs] = defineField('status')
+const [description, descriptionAttrs] = defineField('description')
 
-function resetForm() {
-  form.name = ''
-  form.responsible = ''
-  form.startDate = ''
-  form.status = ''
-  form.description = ''
-  submitted.value = false
-  Object.keys(touched).forEach((k) => (touched[k as FieldName] = false))
-  Object.keys(errors).forEach((k) => (errors[k as FieldName] = ''))
-}
+const loading = ref(false)
 
-async function handleConfirm() {
-  submitted.value = true
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async (formValues) => {
   loading.value = true
   try {
     await new Promise((resolve) => setTimeout(resolve, 500))
-    emit('saved', { ...form })
+    emit('saved', formValues)
     emit('update:modelValue', false)
     resetForm()
   } finally {
     loading.value = false
   }
-}
+})
 
 function handleCancel() {
   resetForm()

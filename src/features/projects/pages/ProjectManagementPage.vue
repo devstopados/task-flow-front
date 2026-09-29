@@ -33,11 +33,9 @@ import TaskHeader from '@/components/TaskHeader.vue'
 import TaskButton from '@/components/TaskButton.vue'
 import TaskTable from '@/components/TaskTable.vue'
 import TaskCard from '@/components/TaskCard.vue'
-import type { TableColumn } from '@/components/TaskTable.vue'
+import type { TableColumn, ProjectFormData, ProjectFilterValues, ProjectItem } from '@/types'
 import ProjectFormModal from '@/features/projects/components/ProjectFormModal.vue'
-import ProjectsFilter, {
-  type ProjectFilterValues,
-} from '@/features/projects/components/ProjectsFilter.vue'
+import ProjectsFilter from '@/features/projects/components/ProjectsFilter.vue'
 
 defineOptions({
   name: 'ProjectManagementPage',
@@ -53,7 +51,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: 'Status' },
 ]
 
-const projects = [
+const projects: ProjectItem[] = [
   {
     code: '---------',
     startDate: '19/03/2026',
@@ -99,7 +97,9 @@ function handleNewProject() {
   showFormModal.value = true
 }
 
-function handleSaved() {}
+function handleSaved(payload: ProjectFormData) {
+  console.log('Projeto salvo:', payload)
+}
 
 function handleSearch(filters: ProjectFilterValues) {
   console.log('Filtros de projeto aplicados:', filters)

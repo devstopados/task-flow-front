@@ -1,16 +1,18 @@
 import { h, type FunctionalComponent } from 'vue'
+import type { MenuItem } from '@/types'
 
-export interface MenuItem {
-  name: string
-  label: string
-  to: string
-  icon: FunctionalComponent
-}
+export type { MenuItem }
 
 const HomeIcon: FunctionalComponent = () =>
   h(
     'svg',
-    { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.5', stroke: 'currentColor' },
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      'stroke-width': '1.5',
+      stroke: 'currentColor',
+    },
     [
       h('path', {
         'stroke-linecap': 'round',
@@ -23,7 +25,13 @@ const HomeIcon: FunctionalComponent = () =>
 const TaskIcon: FunctionalComponent = () =>
   h(
     'svg',
-    { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.5', stroke: 'currentColor' },
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      'stroke-width': '1.5',
+      stroke: 'currentColor',
+    },
     [
       h('path', {
         'stroke-linecap': 'round',
@@ -36,7 +44,13 @@ const TaskIcon: FunctionalComponent = () =>
 const ProjectIcon: FunctionalComponent = () =>
   h(
     'svg',
-    { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.5', stroke: 'currentColor' },
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      'stroke-width': '1.5',
+      stroke: 'currentColor',
+    },
     [
       h('path', {
         'stroke-linecap': 'round',

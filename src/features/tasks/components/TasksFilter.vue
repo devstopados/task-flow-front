@@ -26,16 +26,13 @@ import { reactive } from 'vue'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskSelect from '@/components/TaskSelect.vue'
 import TaskButton from '@/components/TaskButton.vue'
+import type { TaskFilterValues } from '@/types'
 
 defineOptions({
   name: 'TasksFilter',
 })
 
-export interface TaskFilterValues {
-  code: string
-  name: string
-  project: string
-}
+export type { TaskFilterValues }
 
 const emit = defineEmits<{
   (event: 'search', filters: TaskFilterValues): void

@@ -34,8 +34,8 @@ import TaskButton from '@/components/TaskButton.vue'
 import TaskTable from '@/components/TaskTable.vue'
 import TaskCard from '@/components/TaskCard.vue'
 import TaskFormModal from '@/features/tasks/components/TaskFormModal.vue'
-import TasksFilter, { type TaskFilterValues } from '@/features/tasks/components/TasksFilter.vue'
-import type { TableColumn } from '@/components/TaskTable.vue'
+import TasksFilter from '@/features/tasks/components/TasksFilter.vue'
+import type { TableColumn, TaskFormData, TaskFilterValues, TaskItem } from '@/types'
 
 defineOptions({
   name: 'TaskManagementPage',
@@ -49,7 +49,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: 'Status' },
 ]
 
-const tasks = [
+const tasks: TaskItem[] = [
   {
     code: '---------',
     startDate: '19/03/2026',
@@ -97,7 +97,7 @@ function handleNewTask() {
   showNewTaskModal.value = true
 }
 
-function handleTaskSaved(payload: Record<string, unknown>) {
+function handleTaskSaved(payload: TaskFormData) {
   console.log('Tarefa salva:', payload)
 }
 

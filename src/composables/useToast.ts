@@ -1,13 +1,5 @@
 import { ref } from 'vue'
-
-export type ToastType = 'success' | 'error' | 'info' | 'warning'
-
-export interface Toast {
-  id: number
-  message: string
-  type: ToastType
-  duration: number
-}
+import type { Toast, ToastType } from '@/types'
 
 let toastId = 0
 const toasts = ref<Toast[]>([])
@@ -42,3 +34,5 @@ export function useToast() {
     clearToasts,
   }
 }
+
+export type { Toast, ToastType }

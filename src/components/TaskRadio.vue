@@ -148,10 +148,6 @@ function optionClasses(isDisabled: boolean) {
   ];
 }
 
-function valueFromEvent(event: Event): string {
-  return (event.target as HTMLInputElement).value;
-}
-
 function handleChange(value: RadioPrimitive, event: Event) {
   const normalized = String(value);
   emit("update:modelValue", normalized);

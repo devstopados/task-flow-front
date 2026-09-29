@@ -6,33 +6,29 @@
       </h1>
 
       <section class="rounded-2xl bg-white p-8 shadow-lg shadow-slate-200/80">
-        <form class="flex flex-col gap-5" @submit.prevent="handleSubmit">
+        <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
           <TaskInput
-            v-model="form.email"
+            v-model="email"
+            v-bind="emailAttrs"
             id="email"
-            name="email"
             label="E-mail"
             type="email"
             autocomplete="email"
             placeholder="Informe seu e-mail"
             required
-            :error="emailError"
-            @blur="markTouched('email')"
-            @enter="onEnter"
+            :error="errors.email"
           />
 
           <TaskInput
-            v-model="form.password"
+            v-model="password"
+            v-bind="passwordAttrs"
             id="password"
-            name="password"
             label="Senha"
             :type="showPassword ? 'text' : 'password'"
             autocomplete="current-password"
             placeholder="Informe sua senha"
             required
-            :error="passwordError"
-            @blur="markTouched('password')"
-            @enter="onEnter"
+            :error="errors.password"
           >
             <template #append>
               <button
@@ -46,14 +42,7 @@
           </TaskInput>
 
           <div class="mt-2">
-            <TaskButton
-              button-type="submit"
-              full-width
-              :loading="loading"
-              :disabled="isSubmitDisabled"
-            >
-              Acessar
-            </TaskButton>
+            <TaskButton button-type="submit" full-width :loading="loading"> Acessar </TaskButton>
           </div>
         </form>
       </section>
@@ -62,8 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useForm } from 'vee-validate'
+import * as yup from 'yup'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskButton from '@/components/TaskButton.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -79,68 +70,35 @@ const route = useRoute()
 const authStore = useAuthStore()
 const { addToast } = useToast()
 
-type FieldName = 'email' | 'password'
-
-const form = reactive({
-  email: '',
-  password: '',
-})
-
-const touched = reactive<Record<FieldName, boolean>>({
-  email: false,
-  password: false,
-})
-
-const submitted = ref(false)
 const loading = ref(false)
 const showPassword = ref(false)
 
-const emailError = computed(() => {
-  if (!touched.email && !submitted.value) return ''
-  const trimmed = form.email.trim()
-  if (!trimmed) return 'Informe seu e-mail.'
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'Informe um e-mail válido.'
-  return ''
+const loginSchema = yup.object({
+  email: yup.string().trim().required('Informe seu e-mail.').email('Informe um e-mail válido.'),
+  password: yup
+    .string()
+    .required('Informe a senha.')
+    .min(8, 'A senha deve ter ao menos 8 caracteres.'),
 })
 
-const passwordError = computed(() => {
-  if (!touched.password && !submitted.value) return ''
-  if (!form.password) return 'Informe a senha.'
-  if (form.password.length < 8) return 'A senha deve ter ao menos 8 caracteres.'
-  return ''
+const { errors, defineField, handleSubmit } = useForm({
+  validationSchema: loginSchema,
+  initialValues: {
+    email: '',
+    password: '',
+  },
 })
 
-const hasErrors = computed(() => Boolean(emailError.value || passwordError.value))
+const [email, emailAttrs] = defineField('email')
+const [password, passwordAttrs] = defineField('password')
 
-const isSubmitDisabled = computed(
-  () => loading.value || !form.email || !form.password || hasErrors.value,
-)
-
-function markTouched(field: FieldName) {
-  touched[field] = true
-}
-
-function onEnter() {
-  if (!isSubmitDisabled.value) {
-    void handleSubmit()
-  }
-}
-
-async function handleSubmit() {
-  submitted.value = true
-  touched.email = true
-  touched.password = true
-
-  if (hasErrors.value) {
-    return
-  }
-
+const onSubmit = handleSubmit(async (formValues) => {
   loading.value = true
 
   try {
     const response = await authStore.login({
-      email: form.email.trim(),
-      password: form.password,
+      email: formValues.email.trim(),
+      password: formValues.password,
     })
 
     addToast(response.message || 'Login realizado com sucesso!', 'success')
@@ -166,5 +124,5 @@ async function handleSubmit() {
   } finally {
     loading.value = false
   }
-}
+})
 </script>

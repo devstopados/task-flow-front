@@ -14,13 +14,8 @@
       </thead>
 
       <tbody>
-        <tr
-          v-if="rows.length === 0"
-        >
-          <td
-            :colspan="columns.length"
-            class="py-8 text-center text-sm text-gray"
-          >
+        <tr v-if="rows.length === 0">
+          <td :colspan="columns.length" class="py-8 text-center text-sm text-gray">
             {{ emptyMessage }}
           </td>
         </tr>
@@ -30,11 +25,7 @@
           :key="rowIndex"
           class="border-b border-neutral/50 last:border-0"
         >
-          <td
-            v-for="col in columns"
-            :key="col.key"
-            class="py-3 pr-6 text-slate-700"
-          >
+          <td v-for="col in columns" :key="col.key" class="py-3 pr-6 text-slate-700">
             <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]" :index="rowIndex">
               {{ row[col.key] }}
             </slot>
@@ -45,19 +36,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, any>">
+import type { TableColumn } from '@/types'
+
 defineOptions({
   name: 'TaskTable',
 })
 
-export interface TableColumn {
-  key: string
-  label: string
-}
-
 defineProps<{
   columns: TableColumn[]
-  rows: Record<string, unknown>[]
+  rows: T[]
   emptyMessage?: string
 }>()
 </script>
