@@ -20,5 +20,4 @@ import TaskHeader from '@/components/TaskHeader.vue'
 defineOptions({
   name: 'HomePage',
 })
-
 </script>

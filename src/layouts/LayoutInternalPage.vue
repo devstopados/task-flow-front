@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import TaskSideBar from '@/components/TaskSideBar.vue'
 import { useMenu } from '@/composables/useMenu'
@@ -21,6 +22,10 @@ defineOptions({
 const router = useRouter()
 const menuItems = useMenu()
 const authStore = useAuthStore()
+
+onMounted(async () => {
+  await authStore.fetchUser()
+})
 
 async function handleLogout() {
   await authStore.logout()

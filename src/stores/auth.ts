@@ -4,26 +4,14 @@ import { authService } from '@/services/authService'
 import type { User, LoginPayload, LoginResponse } from '@/types'
 
 const TOKEN_KEY = 'taskflow_token'
-const USER_KEY = 'taskflow_user'
 
 function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
 }
 
-function getStoredUser(): User | null {
-  const stored = localStorage.getItem(USER_KEY)
-  if (!stored) return null
-  try {
-    return JSON.parse(stored) as User
-  } catch {
-    localStorage.removeItem(USER_KEY)
-    return null
-  }
-}
-
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(getStoredToken())
-  const user = ref<User | null>(getStoredUser())
+  const user = ref<User | null>(null)
 
   const isAuthenticated = computed(() => Boolean(token.value))
 
@@ -31,14 +19,14 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = newToken
     user.value = newUser
     localStorage.setItem(TOKEN_KEY, newToken)
-    localStorage.setItem(USER_KEY, JSON.stringify(newUser))
+    localStorage.removeItem('taskflow_user')
   }
 
   function clearSession(): void {
     token.value = null
     user.value = null
     localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(USER_KEY)
+    localStorage.removeItem('taskflow_user')
   }
 
   async function login(credentials: LoginPayload): Promise<LoginResponse> {
@@ -62,9 +50,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchUser(): Promise<User | null> {
     if (!token.value) return null
     try {
-      const userData = await authService.getUser()
+      const userData = await authService.getMe()
       user.value = userData
-      localStorage.setItem(USER_KEY, JSON.stringify(userData))
       return userData
     } catch {
       clearSession()

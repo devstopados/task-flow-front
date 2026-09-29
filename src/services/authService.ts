@@ -14,9 +14,21 @@ export const authService = {
     return data
   },
 
+  async getMe(): Promise<User> {
+    const { data } = await api.get<User | { user: User } | { data: User }>(`${url}/me`)
+    if (data && typeof data === 'object') {
+      if ('user' in data && data.user) {
+        return data.user
+      }
+      if ('data' in data && data.data && typeof data.data === 'object' && 'id' in data.data) {
+        return data.data as User
+      }
+    }
+    return data as User
+  },
+
   async getUser(): Promise<User> {
-    const { data } = await api.get<User>(`${url}/user`)
-    return data
+    return this.getMe()
   },
 }
 
