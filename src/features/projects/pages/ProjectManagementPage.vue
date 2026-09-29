@@ -1,34 +1,28 @@
 <template>
   <LayoutInternalPage>
-    <div class="pb-4">
+    <div class="flex flex-col gap-6">
       <TaskHeader> Gestão de Projetos </TaskHeader>
+
+      <TaskCard title="Filtros" collapsible default-collapsed>
+        <ProjectsFilter @search="handleSearch" @clear="handleClear" />
+      </TaskCard>
+
+      <TaskCard title="Lista de projetos">
+        <template #actions>
+          <TaskButton @click="handleNewProject"> Novo Projeto </TaskButton>
+        </template>
+
+        <TaskTable :columns="columns" :rows="projects" empty-message="Nenhum projeto encontrado.">
+          <template #cell-status="{ value }">
+            <span :class="statusClass(value as string)">
+              {{ value }}
+            </span>
+          </template>
+        </TaskTable>
+      </TaskCard>
     </div>
 
-    <TaskCard>
-      <div class="mb-5 flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-secondary">Lista de projetos</h2>
-
-        <div class="flex items-center gap-3">
-          <TaskButton @click="handleNewProject"> Novo Projeto </TaskButton>
-
-          <TaskButton variant="secondary" @click="handleFilters"> Filtros </TaskButton>
-        </div>
-      </div>
-      <div class="py-4">
-        <hr class="border-primary" />
-      </div>
-
-      <TaskTable :columns="columns" :rows="projects" empty-message="Nenhum projeto encontrado.">
-        <template #cell-status="{ value }">
-          <span :class="statusClass(value as string)">
-            {{ value }}
-          </span>
-        </template>
-      </TaskTable>
-    </TaskCard>
-
     <ProjectFormModal v-model="showFormModal" @saved="handleSaved" />
-    <ProjectFilterModal v-model="showFilterModal" @search="handleSearch" @clear="handleClear" />
   </LayoutInternalPage>
 </template>
 
@@ -41,14 +35,15 @@ import TaskTable from '@/components/TaskTable.vue'
 import TaskCard from '@/components/TaskCard.vue'
 import type { TableColumn } from '@/components/TaskTable.vue'
 import ProjectFormModal from '@/features/projects/components/ProjectFormModal.vue'
-import ProjectFilterModal from '@/features/projects/components/ProjectFilterModal.vue'
+import ProjectsFilter, {
+  type ProjectFilterValues,
+} from '@/features/projects/components/ProjectsFilter.vue'
 
 defineOptions({
   name: 'ProjectManagementPage',
 })
 
 const showFormModal = ref(false)
-const showFilterModal = ref(false)
 
 const columns: TableColumn[] = [
   { key: 'code', label: 'Codigo' },
@@ -104,13 +99,13 @@ function handleNewProject() {
   showFormModal.value = true
 }
 
-function handleFilters() {
-  showFilterModal.value = true
-}
-
 function handleSaved() {}
 
-function handleSearch() {}
+function handleSearch(filters: ProjectFilterValues) {
+  console.log('Filtros de projeto aplicados:', filters)
+}
 
-function handleClear() {}
+function handleClear() {
+  console.log('Filtros de projeto limpos')
+}
 </script>

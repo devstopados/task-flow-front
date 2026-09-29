@@ -2,7 +2,7 @@
   <div class="flex min-h-screen">
     <TaskSideBar :menu-items="menuItems" @logout="handleLogout" />
 
-    <main class="flex-1 overflow-y-auto bg-white p-8">
+    <main class="min-w-0 flex-1 bg-white p-8">
       <slot />
     </main>
   </div>

@@ -1,5 +1,5 @@
 <template>
-  <aside class="flex h-screen w-56 flex-col bg-primary text-white">
+  <aside class="sticky top-0 flex h-screen w-56 shrink-0 flex-col bg-primary text-white">
     <div class="flex h-16 items-center justify-center border-b border-white/10">
       <h1 class="text-xl font-light tracking-tight">
         <span class="font-semibold">Task</span><span class="font-light">Flow</span>
