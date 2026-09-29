@@ -20,7 +20,7 @@ const { toasts, removeToast } = useToast()
       v-for="toast in toasts"
       :key="toast.id"
       :type="toast.type"
-      :title="toast.message"
+      :subtitle="toast.message"
       @close="removeToast(toast.id)"
     />
   </TransitionGroup>

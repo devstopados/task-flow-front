@@ -13,37 +13,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
-
 import LayoutInternalPage from '@/layouts/LayoutInternalPage.vue'
 import ActivityCard from '@/features/home/components/ActivityCard.vue'
 import TaskHeader from '@/components/TaskHeader.vue'
-import { useLoading } from '@/composables/useLoading'
-import { useToast } from '@/composables/useToast'
 
 defineOptions({
   name: 'HomePage',
 })
 
-const { showLoading, hideLoading } = useLoading()
-const { addToast } = useToast()
-
-let loadingTimeout: ReturnType<typeof setTimeout> | null = null
-
-onMounted(() => {
-  showLoading()
-
-  loadingTimeout = setTimeout(() => {
-    hideLoading()
-    addToast('Bem-vindo à Home!', 'info', 5000)
-  }, 3000)
-})
-
-onUnmounted(() => {
-  if (loadingTimeout) {
-    clearTimeout(loadingTimeout)
-  }
-
-  hideLoading()
-})
 </script>

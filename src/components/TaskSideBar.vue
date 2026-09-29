@@ -22,7 +22,7 @@
         <li>
           <button
             type="button"
-            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition hover:bg-white/10"
+            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition hover:bg-white/10 cursor-pointer"
             @click="handleLogout"
           >
             <LogoutIcon class="h-5 w-5 shrink-0" />
@@ -33,8 +33,12 @@
     </nav>
 
     <div class="border-t border-white/10 px-4 py-4">
-      <p class="text-sm font-semibold leading-tight">Usuário 01</p>
-      <p class="text-xs leading-tight text-white/70">usuário@gmail.com</p>
+      <p class="truncate text-sm font-semibold leading-tight">
+        {{ authStore.user?.name || 'Usuário' }}
+      </p>
+      <p class="truncate text-xs leading-tight text-white/70">
+        {{ authStore.user?.email || 'usuario@exemplo.com' }}
+      </p>
     </div>
   </aside>
 </template>
@@ -42,10 +46,13 @@
 <script setup lang="ts">
 import { h, type FunctionalComponent } from 'vue'
 import type { MenuItem } from '@/composables/useMenu'
+import { useAuthStore } from '@/stores/auth'
 
 defineOptions({
   name: 'TaskSideBar',
 })
+
+const authStore = useAuthStore()
 
 defineProps<{
   menuItems: MenuItem[]

@@ -8,16 +8,16 @@
       <section class="rounded-2xl bg-white p-8 shadow-lg shadow-slate-200/80">
         <form class="flex flex-col gap-5" @submit.prevent="handleSubmit">
           <TaskInput
-            v-model="form.username"
-            id="username"
-            name="username"
-            label="Usuário"
-            type="text"
-            autocomplete="username"
+            v-model="form.email"
+            id="email"
+            name="email"
+            label="E-mail"
+            type="email"
+            autocomplete="email"
             placeholder="Informe seu e-mail"
             required
-            :error="usernameError"
-            @blur="markTouched('username')"
+            :error="emailError"
+            @blur="markTouched('email')"
             @enter="onEnter"
           />
 
@@ -63,24 +63,30 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskButton from '@/components/TaskButton.vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
+import { ApiError } from '@/api'
 
 defineOptions({
   name: 'LoginPage',
 })
 
-type FieldName = 'username' | 'password'
+const router = useRouter()
+const authStore = useAuthStore()
+const { addToast } = useToast()
+
+type FieldName = 'email' | 'password'
 
 const form = reactive({
-  username: '',
+  email: '',
   password: '',
 })
 
 const touched = reactive<Record<FieldName, boolean>>({
-  username: false,
+  email: false,
   password: false,
 })
 
@@ -88,9 +94,11 @@ const submitted = ref(false)
 const loading = ref(false)
 const showPassword = ref(false)
 
-const usernameError = computed(() => {
-  if (!touched.username && !submitted.value) return ''
-  if (!form.username.trim()) return 'Informe o usuário.'
+const emailError = computed(() => {
+  if (!touched.email && !submitted.value) return ''
+  const trimmed = form.email.trim()
+  if (!trimmed) return 'Informe seu e-mail.'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'Informe um e-mail válido.'
   return ''
 })
 
@@ -101,10 +109,10 @@ const passwordError = computed(() => {
   return ''
 })
 
-const hasErrors = computed(() => Boolean(usernameError.value || passwordError.value))
+const hasErrors = computed(() => Boolean(emailError.value || passwordError.value))
 
 const isSubmitDisabled = computed(
-  () => loading.value || !form.username || !form.password || hasErrors.value,
+  () => loading.value || !form.email || !form.password || hasErrors.value,
 )
 
 function markTouched(field: FieldName) {
@@ -119,7 +127,7 @@ function onEnter() {
 
 async function handleSubmit() {
   submitted.value = true
-  touched.username = true
+  touched.email = true
   touched.password = true
 
   if (hasErrors.value) {
@@ -129,8 +137,26 @@ async function handleSubmit() {
   loading.value = true
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    const response = await authStore.login({
+      email: form.email.trim(),
+      password: form.password,
+    })
+
+    addToast(response.message || 'Login realizado com sucesso!', 'success')
     router.push({ name: 'home' })
+  } catch (err: unknown) {
+    if (err instanceof ApiError) {
+      if (err.errors) {
+        const errorMessages = Object.values(err.errors).flat()
+        addToast(errorMessages[0] || err.message, 'error')
+      } else {
+        addToast(err.message, 'error')
+      }
+    } else if (err instanceof Error) {
+      addToast(err.message, 'error')
+    } else {
+      addToast('Ocorreu um erro ao realizar o login. Tente novamente.', 'error')
+    }
   } finally {
     loading.value = false
   }

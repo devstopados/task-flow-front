@@ -12,6 +12,7 @@
 import { useRouter } from 'vue-router'
 import TaskSideBar from '@/components/TaskSideBar.vue'
 import { useMenu } from '@/composables/useMenu'
+import { useAuthStore } from '@/stores/auth'
 
 defineOptions({
   name: 'LayoutInternalPage',
@@ -19,8 +20,10 @@ defineOptions({
 
 const router = useRouter()
 const menuItems = useMenu()
+const authStore = useAuthStore()
 
-function handleLogout() {
+async function handleLogout() {
+  await authStore.logout()
   router.push({ name: 'login' })
 }
 </script>
