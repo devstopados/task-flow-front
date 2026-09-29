@@ -54,12 +54,12 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useForm } from 'vee-validate'
-import * as yup from 'yup'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskButton from '@/components/TaskButton.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { ApiError } from '@/api'
+import { loginSchema } from '@/validators'
 
 defineOptions({
   name: 'LoginPage',
@@ -72,14 +72,6 @@ const { addToast } = useToast()
 
 const loading = ref(false)
 const showPassword = ref(false)
-
-const loginSchema = yup.object({
-  email: yup.string().trim().required('Informe seu e-mail.').email('Informe um e-mail válido.'),
-  password: yup
-    .string()
-    .required('Informe a senha.')
-    .min(8, 'A senha deve ter ao menos 8 caracteres.'),
-})
 
 const { errors, defineField, handleSubmit } = useForm({
   validationSchema: loginSchema,

@@ -67,12 +67,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useForm } from 'vee-validate'
-import * as yup from 'yup'
 import TaskModal from '@/components/TaskModal.vue'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskSelect from '@/components/TaskSelect.vue'
 import TaskTextArea from '@/components/TaskTextArea.vue'
 import type { ProjectFormData } from '@/types'
+import { projectSchema } from '@/validators'
 
 defineOptions({
   name: 'ProjectFormModal',
@@ -95,14 +95,6 @@ const statusOptions = [
   { label: 'Pausado', value: 'Pausado' },
   { label: 'Concluído', value: 'Concluído' },
 ]
-
-const projectSchema = yup.object({
-  name: yup.string().trim().required('Informe o nome do projeto.'),
-  responsible: yup.string().trim().required('Informe o responsável.'),
-  startDate: yup.string().required('Informe a data de início.'),
-  status: yup.string().required('Selecione um status.'),
-  description: yup.string().default(''),
-})
 
 const { errors, defineField, handleSubmit, resetForm } = useForm<ProjectFormData>({
   validationSchema: projectSchema,
