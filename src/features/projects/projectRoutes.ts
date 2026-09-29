@@ -5,5 +5,8 @@ export const projectRoutes: RouteRecordRaw[] = [
     path: '/projetos',
     name: 'projects',
     component: () => import('@/features/projects/pages/ProjectManagementPage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
 ]

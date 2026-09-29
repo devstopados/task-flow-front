@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import TaskInput from '@/components/TaskInput.vue'
 import TaskButton from '@/components/TaskButton.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -75,6 +75,7 @@ defineOptions({
 })
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const { addToast } = useToast()
 
@@ -143,7 +144,12 @@ async function handleSubmit() {
     })
 
     addToast(response.message || 'Login realizado com sucesso!', 'success')
-    router.push({ name: 'home' })
+    const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : null
+    if (redirectPath) {
+      router.push(redirectPath)
+    } else {
+      router.push({ name: 'home' })
+    }
   } catch (err: unknown) {
     if (err instanceof ApiError) {
       if (err.errors) {

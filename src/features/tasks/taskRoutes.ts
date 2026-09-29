@@ -5,5 +5,8 @@ export const taskRoutes: RouteRecordRaw[] = [
     path: '/tarefas',
     name: 'tasks',
     component: () => import('@/features/tasks/pages/TaskManagementPage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
 ]

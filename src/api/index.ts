@@ -47,6 +47,15 @@ api.interceptors.response.use(
     if (error.response) {
       const data = error.response.data
       const status = error.response.status
+
+      if (status === 401) {
+        localStorage.removeItem('taskflow_token')
+        localStorage.removeItem('taskflow_user')
+        if (window.location.hash && window.location.hash !== '#/') {
+          window.location.hash = '#/'
+        }
+      }
+
       const message =
         (data && typeof data === 'object' && data.message) ||
         error.message ||
