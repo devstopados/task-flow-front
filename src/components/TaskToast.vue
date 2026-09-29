@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import TaskNotification from '@/components/TaskNotification.vue'
-import { useToastStore } from '@/stores/toast'
+import { useToast } from '@/composables/useToast'
 
-const toastStore = useToastStore()
+const { toasts, removeToast } = useToast()
 </script>
 
 <template>
@@ -17,11 +17,11 @@ const toastStore = useToastStore()
     class="fixed right-4 top-4 z-9998 flex flex-col gap-3"
   >
     <TaskNotification
-      v-for="toast in toastStore.toasts"
+      v-for="toast in toasts"
       :key="toast.id"
       :type="toast.type"
       :title="toast.message"
-      @close="toastStore.removeToast(toast.id)"
+      @close="removeToast(toast.id)"
     />
   </TransitionGroup>
 </template>

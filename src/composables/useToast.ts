@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { defineStore } from 'pinia'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
@@ -11,10 +10,9 @@ export interface Toast {
 }
 
 let toastId = 0
+const toasts = ref<Toast[]>([])
 
-export const useToastStore = defineStore('toast', () => {
-  const toasts = ref<Toast[]>([])
-
+export function useToast() {
   function addToast(message: string, type: ToastType = 'info', duration = 5000): number {
     const id = ++toastId
 
@@ -33,9 +31,14 @@ export const useToastStore = defineStore('toast', () => {
     toasts.value = toasts.value.filter((toast) => toast.id !== id)
   }
 
+  function clearToasts(): void {
+    toasts.value = []
+  }
+
   return {
     toasts,
     addToast,
     removeToast,
+    clearToasts,
   }
-})
+}

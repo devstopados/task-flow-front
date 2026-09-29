@@ -3,15 +3,15 @@ import { RouterView } from 'vue-router'
 
 import TaskLoading from '@/components/TaskLoading.vue'
 import TaskToast from '@/components/TaskToast.vue'
-import { useLoadingStore } from '@/stores/loading'
+import { useLoading } from '@/composables/useLoading'
 
-const loadingStore = useLoadingStore()
+const { isLoading, message } = useLoading()
 </script>
 
 <template>
   <RouterView />
 
-  <TaskLoading :visible="loadingStore.isLoading" :message="loadingStore.message" />
+  <TaskLoading :visible="isLoading" :message="message" />
 
   <TaskToast />
 </template>
