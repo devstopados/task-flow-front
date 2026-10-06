@@ -1,78 +1,36 @@
 <template>
   <TaskModal
     :model-value="modelValue"
-    title="Novo Projeto"
-    subtitle="Preencha os dados para criar um novo projeto"
+    :title="modalTitle"
+    :subtitle="modalSubtitle"
     confirm-label="Salvar"
-    :loading="loading"
+    :loading="projectStore.saving"
     @update:model-value="emit('update:modelValue', $event)"
     @confirm="onSubmit"
     @cancel="handleCancel"
   >
     <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-      <div class="grid grid-cols-2 gap-4">
-        <TaskInput
-          v-model="name"
-          v-bind="nameAttrs"
-          label="Nome do projeto"
-          placeholder="Digite o nome"
-          required
-          :error="errors.name"
-        />
-
-        <TaskInput
-          v-model="responsible"
-          v-bind="responsibleAttrs"
-          label="Responsável"
-          placeholder="Digite o responsável"
-          required
-          :error="errors.responsible"
-        />
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <TaskInput
-          v-model="startDate"
-          v-bind="startDateAttrs"
-          label="Data de início"
-          type="date"
-          required
-          :error="errors.startDate"
-        />
-
-        <TaskSelect
-          v-model="status"
-          v-bind="statusAttrs"
-          label="Status"
-          placeholder="Selecione o status"
-          :options="statusOptions"
-          required
-          :error="errors.status"
-        />
-      </div>
-
-      <TaskTextArea
-        v-model="description"
-        v-bind="descriptionAttrs"
-        label="Descrição"
-        placeholder="Descreva o projeto"
-        :rows="3"
-        :max-length="500"
-        show-counter
+      <TaskInput
+        v-model="name"
+        v-bind="nameAttrs"
+        label="Nome do projeto"
+        placeholder="Digite o nome do projeto"
+        required
+        :error="errors.name"
       />
     </form>
   </TaskModal>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import TaskModal from '@/components/TaskModal.vue'
 import TaskInput from '@/components/TaskInput.vue'
-import TaskSelect from '@/components/TaskSelect.vue'
-import TaskTextArea from '@/components/TaskTextArea.vue'
-import type { ProjectFormData } from '@/types'
+import type { ProjectFormData, ProjectItem } from '@/types'
 import { projectSchema } from '@/validators'
+import { useProjectStore } from '@/stores/project'
+import { useToast } from '@/composables/useToast'
 
 defineOptions({
   name: 'ProjectFormModal',
@@ -80,54 +38,78 @@ defineOptions({
 
 export type { ProjectFormData }
 
-defineProps<{
-  modelValue: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean
+    project?: ProjectItem | null
+  }>(),
+  {
+    project: null,
+  },
+)
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void
   (event: 'saved', payload: ProjectFormData): void
 }>()
 
-const statusOptions = [
-  { label: 'Não Iniciado', value: 'Não Iniciado' },
-  { label: 'Em andamento', value: 'Em andamento' },
-  { label: 'Pausado', value: 'Pausado' },
-  { label: 'Concluído', value: 'Concluído' },
-]
+const projectStore = useProjectStore()
+const { addToast } = useToast()
+
+const isEditing = computed(() => Boolean(props.project?.id))
+const modalTitle = computed(() => (isEditing.value ? 'Editar Projeto' : 'Novo Projeto'))
+const modalSubtitle = computed(() =>
+  isEditing.value ? 'Atualize o nome do projeto' : 'Preencha o nome para criar um novo projeto',
+)
 
 const { errors, defineField, handleSubmit, resetForm } = useForm<ProjectFormData>({
   validationSchema: projectSchema,
   initialValues: {
     name: '',
-    responsible: '',
-    startDate: '',
-    status: '',
-    description: '',
   },
 })
 
 const [name, nameAttrs] = defineField('name')
-const [responsible, responsibleAttrs] = defineField('responsible')
-const [startDate, startDateAttrs] = defineField('startDate')
-const [status, statusAttrs] = defineField('status')
-const [description, descriptionAttrs] = defineField('description')
 
-const loading = ref(false)
+watch(
+  () => [props.modelValue, props.project],
+  ([isOpen]) => {
+    if (isOpen) {
+      resetForm({
+        values: {
+          name: props.project?.name ?? '',
+        },
+      })
+    }
+  },
+  { immediate: true },
+)
 
 const onSubmit = handleSubmit(async (formValues) => {
-  loading.value = true
   try {
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    if (isEditing.value && props.project?.id) {
+      await projectStore.updateProject(props.project.id, {
+        name: formValues.name,
+      })
+      addToast('Projeto atualizado com sucesso!', 'success')
+    } else {
+      await projectStore.createProject({
+        name: formValues.name,
+      })
+      addToast('Projeto criado com sucesso!', 'success')
+    }
     emit('saved', formValues)
     emit('update:modelValue', false)
     resetForm()
-  } finally {
-    loading.value = false
+  } catch (err: unknown) {
+    const action = isEditing.value ? 'atualizar' : 'criar'
+    const message = err instanceof Error ? err.message : `Erro ao ${action} projeto`
+    addToast(message, 'error')
   }
 })
 
 function handleCancel() {
   resetForm()
+  emit('update:modelValue', false)
 }
 </script>
