@@ -1,4 +1,5 @@
 import type { PaginationParams } from './paginationInterface'
+import type { Project } from './projectInterface'
 
 export interface Subproject {
   id: number
@@ -7,6 +8,7 @@ export interface Subproject {
   active?: boolean
   created_at?: string
   updated_at?: string
+  project?: Project
 }
 
 export interface CreateSubprojectPayload {
