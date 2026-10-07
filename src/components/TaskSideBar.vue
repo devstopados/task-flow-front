@@ -44,7 +44,11 @@
                 stroke-width="2"
                 stroke="currentColor"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                />
               </svg>
             </button>
 
@@ -57,14 +61,15 @@
               leave-from-class="opacity-100 translate-y-0"
               leave-to-class="opacity-0 -translate-y-1"
             >
-              <ul v-if="isExpanded(item.name)" class="mt-1 flex flex-col gap-1 pl-7">
+              <ul v-if="isExpanded(item.name)" class="mt-1 pt-1 flex flex-col gap-1 pl-7">
                 <li v-for="child in item.children" :key="child.name">
                   <router-link
                     :to="child.to"
-                    class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
                     active-class="bg-white/20 !text-white font-semibold"
                   >
-                    <span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>
+                    <component :is="child.icon" v-if="child.icon" class="h-4 w-4 shrink-0" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-white/60"></span>
                     {{ child.label }}
                   </router-link>
                 </li>
@@ -130,14 +135,20 @@ function toggleExpand(name: string) {
 
 function isChildActive(item: MenuItem): boolean {
   if (!item.children || item.children.length === 0) return false
-  return item.children.some((child) => route.path === child.to || route.path.startsWith(child.to + '/'))
+  return item.children.some(
+    (child) => route.path === child.to || route.path.startsWith(child.to + '/'),
+  )
 }
 
 watch(
   () => route.path,
   (currentPath) => {
     props.menuItems.forEach((item) => {
-      if (item.children?.some((child) => currentPath === child.to || currentPath.startsWith(child.to + '/'))) {
+      if (
+        item.children?.some(
+          (child) => currentPath === child.to || currentPath.startsWith(child.to + '/'),
+        )
+      ) {
         expandedItems.value[item.name] = true
       }
     })
