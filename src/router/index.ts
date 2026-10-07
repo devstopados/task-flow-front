@@ -3,6 +3,7 @@ import { authRoutes } from '@/features/auth/authRoutes'
 import { homeRoutes } from '@/features/home/homeRoutes'
 import { taskRoutes } from '@/features/tasks/taskRoutes'
 import { projectRoutes } from '@/features/projects/projectRoutes'
+import { statusTaskRoutes } from '@/features/statusTasks/statusTaskRoutes'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -11,6 +12,7 @@ const router = createRouter({
     ...homeRoutes,
     ...taskRoutes,
     ...projectRoutes,
+    ...statusTaskRoutes,
     {
       path: '/:pathMatch(.*)*',
       redirect: '/inicio',

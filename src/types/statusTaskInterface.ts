@@ -31,3 +31,18 @@ export interface StatusTaskActionResponse {
   message?: string
   data?: StatusTask
 }
+
+export interface StatusTaskFormData {
+  name: string
+  slug?: string
+  active?: boolean
+}
+
+export interface StatusTaskItem {
+  id: number
+  name: string
+  slug?: string
+  active?: boolean
+  rawStatusTask: StatusTask
+}
+
