@@ -103,10 +103,66 @@ const StatusTaskIcon: FunctionalComponent = () =>
     ],
   )
 
+const BacklogIcon: FunctionalComponent = () =>
+  h(
+    'svg',
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      'stroke-width': '1.5',
+      stroke: 'currentColor',
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: 'M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z',
+      }),
+    ],
+  )
+
+const SprintIcon: FunctionalComponent = () =>
+  h(
+    'svg',
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      'stroke-width': '1.5',
+      stroke: 'currentColor',
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z',
+      }),
+    ],
+  )
+
 export function useMenu(): MenuItem[] {
   return [
     { name: 'home', label: 'Início', to: '/inicio', icon: HomeIcon },
-    { name: 'tasks', label: 'Gestão de Tarefas', to: '/tarefas', icon: TaskIcon },
+    {
+      name: 'tasks',
+      label: 'Gerenciar Tarefas',
+      icon: TaskIcon,
+      children: [
+        {
+          name: 'tasks-backlog',
+          label: 'Backlog',
+          to: '/tarefas/backlog',
+          icon: BacklogIcon,
+        },
+        {
+          name: 'tasks-sprint',
+          label: 'Sprint',
+          to: '/tarefas/sprint',
+          icon: SprintIcon,
+        },
+      ],
+    },
     { name: 'projects', label: 'Gestão de Projetos', to: '/projetos', icon: ProjectIcon },
     {
       name: 'settings',

@@ -1,7 +1,7 @@
 <template>
   <LayoutInternalPage>
     <div class="flex flex-col gap-6">
-      <TaskHeader> Gestão de Tarefas </TaskHeader>
+      <TaskHeader> Backlog </TaskHeader>
 
       <TaskCard title="Filtros" collapsible default-collapsed>
         <TasksFilter @search="handleSearch" @clear="handleClearFilters" />
